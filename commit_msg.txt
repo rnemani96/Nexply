@@ -1,0 +1,10 @@
+feat: RAJESH AI v3.0 - Autonomous Job Applier
+
+- 10 job sources (Himalayas, RemoteOK, Jobicy, Remotive, WWR, AI-Jobs, visa-focused)
+- Smart location filter: foreign-country jobs require visa sponsorship
+- Universal visa detection (H1B, UK, EU, Canada, Australia, Singapore, UAE + more)
+- Beautiful dark-themed GUI with system tray & 30-min auto-scan
+- Multi-AI provider: Gemini + Ollama + LM Studio with rate-limit failover
+- Data Science + QA/Test roles + worldwide preference
+- PyInstaller EXE build (194MB self-contained)
+- ATS-optimized resume tailoring per job

@@ -1,0 +1,252 @@
+project:
+  name: "Rajesh AI Job Agent"
+  version: "3.0.0"
+
+# ============================================================
+# AI PROVIDER CONFIG
+# ============================================================
+ai:
+  provider: "ollama"            # gemini | ollama | lmstudio
+
+  gemini:
+    jd_analysis_model: "gemini-3.8-flash"
+    resume_model: "gemini-3.1-pro-preview"
+    enabled: true
+
+  ollama:
+    base_url: "http://localhost:11434"
+    jd_analysis_model: "llama3.1"
+    resume_model: "llama3.1"
+    timeout_seconds: 120
+    enabled: true
+
+  lmstudio:
+    base_url: "http://localhost:1234/v1"
+    jd_analysis_model: "local-model"
+    resume_model: "local-model"
+    timeout_seconds: 180
+    enabled: false
+
+  fallback_chain: ["ollama", "gemini"]
+
+# ============================================================
+# CANDIDATE PROFILE
+# ============================================================
+candidate:
+  name: "Rajesh"
+
+  # === PRIMARY TARGET ROLES ===
+  roles:
+    # GenAI / LLM Engineering
+    - "GenAI Engineer"
+    - "Generative AI Engineer"
+    - "RAG Engineer"
+    - "LLM Engineer"
+    - "AI/ML Engineer"
+    - "Machine Learning Engineer"
+    - "NLP Engineer"
+    - "AI Engineer"
+    - "MLOps Engineer"
+    - "LLMOps Engineer"
+
+    # Data Science
+    - "Data Scientist"
+    - "Senior Data Scientist"
+    - "Applied Data Scientist"
+    - "Data Science Engineer"
+
+    # QA / Test Engineering
+    - "AI Test Engineer"
+    - "ML Test Engineer"
+    - "QA Engineer"
+    - "SDET"
+    - "Test Automation Engineer"
+    - "Quality Assurance Engineer"
+
+  # === ROLE GROUPS ===
+  role_groups:
+    primary:       ["GenAI Engineer", "LLM Engineer", "RAG Engineer", "AI Engineer", "Generative AI Engineer"]
+    secondary:     ["Machine Learning Engineer", "AI/ML Engineer", "MLOps Engineer", "LLMOps Engineer", "NLP Engineer"]
+    data_science:  ["Data Scientist", "Senior Data Scientist", "Applied Data Scientist", "Data Science Engineer"]
+    test:          ["AI Test Engineer", "ML Test Engineer", "QA Engineer", "SDET", "Test Automation Engineer", "Quality Assurance Engineer"]
+
+  locations:
+    - "Worldwide"        # HIGHEST PRIORITY
+    - "Remote"
+    - "India"
+    - "Hyderabad"
+
+  prefer_worldwide: true   # +10 bonus score for worldwide/no-restriction jobs
+  visa_required: true      # Also search for visa-sponsoring jobs (H1B, UK, EU, Canada)
+
+  home_country: "India"    # Jobs from this country are ALWAYS kept (no visa needed)
+
+  experience_years: 6
+
+  employment_type:
+    - "Full-time"
+
+  resume_format: "auto"    # auto | india | us | uk | eu
+
+# ============================================================
+# LOCATION FILTER
+# ============================================================
+filter:
+  # If true: foreign-country jobs are only kept when they mention visa sponsorship.
+  # India jobs + Remote/Worldwide jobs are ALWAYS kept regardless.
+  foreign_without_sponsorship: true
+
+  # Countries whose jobs are treated as "home" (always kept, no visa needed).
+  # Default is determined by candidate.home_country above.
+  # Add more if you're open to working in neighboring countries without a visa:
+  # extra_home_countries: ["Sri Lanka", "Nepal"]
+
+
+# ============================================================
+# JOB SOURCES  (8 sources total — all remote/worldwide focused)
+# ============================================================
+sources:
+
+  # --- FREE PUBLIC APIs (no auth needed) ---
+
+  himalayas:
+    enabled: true
+    max_jobs_per_run: 150
+    prefer_worldwide: true
+    tags: ["genai", "llm", "rag", "machine-learning", "data-science", "test-engineer", "nlp", "mlops"]
+
+  remoteok:
+    enabled: true
+    max_jobs_per_run: 100
+    # Tags: https://remoteok.com/api  |  worldwide by default
+    tags: ["machine-learning", "ai", "data-science", "python", "nlp", "qa"]
+
+  jobicy:
+    enabled: true
+    max_jobs_per_run: 100
+    # Free JSON API: https://jobicy.com/api/v2/remote-jobs?tag=machine-learning
+    tags: ["machine-learning", "data-science", "artificial-intelligence", "quality-assurance"]
+
+  remotive:
+    enabled: true
+    max_jobs_per_run: 100
+    # Free API: https://remotive.com/api/remote-jobs?category=data
+    categories: ["data", "software-dev", "testing", "qa"]
+
+  weworkremotely:
+    enabled: true
+    max_jobs_per_run: 80
+    # Free RSS: https://weworkremotely.com/remote-jobs.rss
+    categories:
+      - "https://weworkremotely.com/categories/remote-data-science-jobs.rss"
+      - "https://weworkremotely.com/categories/remote-back-end-programming-jobs.rss"
+      - "https://weworkremotely.com/categories/remote-full-stack-programming-jobs.rss"
+
+  aijobs:
+    # ai-jobs.net — AI/ML specialist board
+    enabled: true
+    max_jobs_per_run: 80
+    # RSS feed: https://ai-jobs.net/feed/
+    feed_url: "https://ai-jobs.net/feed/"
+
+  # --- AUTH-REQUIRED SOURCES (disabled by default) ---
+
+  linkedin:
+    enabled: false
+    easy_apply_only: true
+    max_jobs_per_run: 50
+    session_cookie: ""      # Set LINKEDIN_SESSION_COOKIE env var
+
+  naukri:
+    enabled: false
+    max_jobs_per_run: 50
+
+  wellfound:
+    enabled: false
+    max_jobs_per_run: 30
+
+  # --- VISA-SPONSORING JOBS (any country worldwide) ---
+  visa_jobs:
+    enabled: true
+    max_jobs_per_run: 150
+    # Detects visa sponsorship for ANY country — smart keyword matching.
+    # Positive: "visa sponsorship", "work permit", "we sponsor", "relocation",
+    #           H1B, UK Skilled Worker, EU Blue Card, Singapore EP, Canada LMIA,
+    #           Australia 482, UAE, Netherlands, Ireland, NZ, Japan, Nordic + more.
+    # Negative: "no sponsorship", "cannot sponsor", "citizens only", etc.
+    # Country label auto-detected and stored per job.
+
+# ============================================================
+# MATCHING
+# ============================================================
+search:
+  max_jobs_per_run: 600          # Increased — more sources + visa
+  save_duplicates: false
+  min_match_score: 60
+  top_matches_per_day: 20
+
+  # Worldwide/no-location jobs get +10 bonus score
+  worldwide_bonus: 10
+
+  # Visa-sponsoring jobs get +15 bonus score
+  visa_sponsoring_bonus: 15
+
+# ============================================================
+# APPLICATION SETTINGS
+# ============================================================
+application:
+  mode: "human_approval"         # human_approval | auto
+  auto_apply_score: 85
+  follow_up_days: 7
+
+# ============================================================
+# ATS SETTINGS
+# ============================================================
+ats:
+  min_ats_score: 75
+  keyword_density_target: 0.60
+
+# ============================================================
+# GUI SETTINGS
+# ============================================================
+gui:
+  theme: "dark"                  # dark | light
+  accent_color: "#6C63FF"        # Purple accent
+  window_width: 1400
+  window_height: 900
+  auto_refresh_seconds: 30       # Dashboard auto-refresh interval
+  minimize_to_tray: true         # Close button → minimize to tray
+  show_tray_notifications: true  # Windows toast notifications
+
+# ============================================================
+# BUDGET
+# ============================================================
+budget:
+  currency: "INR"
+  monthly_limit: 0
+  allow_paid_services: false
+
+# ============================================================
+# SCHEDULER
+# ============================================================
+scheduler:
+  # Auto-scan every 30 minutes (tray background process)
+  scan_interval_minutes: 30
+
+  # Legacy daily schedule (used when running CLI scheduler)
+  daily_hunt_time: "08:00"
+  follow_up_check_time: "17:00"
+  timezone: "Asia/Kolkata"
+
+  # Run full pipeline (not just hunt) every N hours
+  full_pipeline_interval_hours: 6
+
+# ============================================================
+# PATHS
+# ============================================================
+paths:
+  master_resume: "resume/master_resume.docx"
+  generated_resumes: "resume/generated"
+  database: "data/jobs.db"
+  output: "output"
+  logs: "logs"
