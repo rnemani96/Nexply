@@ -16,15 +16,15 @@ set "EXE="
 
 :: 1. Same folder as this bat
 if exist "%HERE%\Nexply.exe"              set "EXE=%HERE%\Nexply.exe"
-if exist "%HERE%\RajeshAI.exe"            set "EXE=%HERE%\RajeshAI.exe"
+if exist "%HERE%\Nexply.exe"            set "EXE=%HERE%\Nexply.exe"
 
-:: 2. dist\Nexply or dist\RajeshAI sub-folder
+:: 2. dist\Nexply or dist\Nexply sub-folder
 if exist "%HERE%\dist\Nexply\Nexply.exe"        set "EXE=%HERE%\dist\Nexply\Nexply.exe"
-if exist "%HERE%\dist\RajeshAI\RajeshAI.exe"    set "EXE=%HERE%\dist\RajeshAI\RajeshAI.exe"
+if exist "%HERE%\dist\Nexply\Nexply.exe"    set "EXE=%HERE%\dist\Nexply\Nexply.exe"
 
 :: 3. Parent folder (if launcher dropped inside dist)
 if exist "%HERE%\..\Nexply.exe"           set "EXE=%HERE%\..\Nexply.exe"
-if exist "%HERE%\..\RajeshAI.exe"         set "EXE=%HERE%\..\RajeshAI.exe"
+if exist "%HERE%\..\Nexply.exe"         set "EXE=%HERE%\..\Nexply.exe"
 
 :: ── If EXE found — launch it ───────────────────────────────
 if defined EXE (
@@ -53,7 +53,7 @@ if not defined PY (
     echo  ║  Neither the pre-built EXE nor Python was found. ║
     echo  ║                                                  ║
     echo  ║  Options:                                        ║
-    echo  ║  1. Use the EXE: dist\RajeshAI\RajeshAI.exe     ║
+    echo  ║  1. Use the EXE: dist\Nexply\Nexply.exe     ║
     echo  ║  2. Install Python 3.11+ from python.org         ║
     echo  ║     then run:  pip install -r requirements.txt   ║
     echo  ╚══════════════════════════════════════════════════╝
