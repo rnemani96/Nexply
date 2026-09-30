@@ -1,82 +1,74 @@
 @echo off
-setlocal EnableDelayedExpansion
-title Nexply — Starting...
+setlocal
+title Nexply
 
-:: ============================================================
-::  NEXPLY — Portable Launcher
-::  Drop this file anywhere. It finds and runs the app.
-:: ============================================================
+cd /d "%~dp0"
 
-:: ── Where is this batch file? ──────────────────────────────
-set "HERE=%~dp0"
-set "HERE=%HERE:~0,-1%"
+REM 1. Check for standalone EXE in current directory
+if exist "Nexply.exe" goto :run_current_nexply
+if exist "RajeshAI.exe" goto :run_current_rajesh
 
-:: ── Look for the EXE (pre-built, no install needed) ────────
-set "EXE="
+REM 2. Check in dist subfolder
+if exist "dist\Nexply\Nexply.exe" goto :run_dist_nexply
+if exist "dist\RajeshAI\RajeshAI.exe" goto :run_dist_rajesh
 
-:: 1. Same folder as this bat
-if exist "%HERE%\Nexply.exe"              set "EXE=%HERE%\Nexply.exe"
-if exist "%HERE%\Nexply.exe"            set "EXE=%HERE%\Nexply.exe"
+REM 3. Check in parent folder
+if exist "..\Nexply.exe" goto :run_parent_nexply
+if exist "..\RajeshAI.exe" goto :run_parent_rajesh
 
-:: 2. dist\Nexply or dist\Nexply sub-folder
-if exist "%HERE%\dist\Nexply\Nexply.exe"        set "EXE=%HERE%\dist\Nexply\Nexply.exe"
-if exist "%HERE%\dist\Nexply\Nexply.exe"    set "EXE=%HERE%\dist\Nexply\Nexply.exe"
+REM 4. Fallback to Python source
+goto :run_python
 
-:: 3. Parent folder (if launcher dropped inside dist)
-if exist "%HERE%\..\Nexply.exe"           set "EXE=%HERE%\..\Nexply.exe"
-if exist "%HERE%\..\Nexply.exe"         set "EXE=%HERE%\..\Nexply.exe"
+:run_current_nexply
+start "" "Nexply.exe"
+exit /b 0
 
-:: ── If EXE found — launch it ───────────────────────────────
-if defined EXE (
-    for %%F in ("!EXE!") do set "WORK_DIR=%%~dpF"
-    echo Starting Nexply (pre-built)...
-    start "" /D "!WORK_DIR!" "!EXE!"
-    exit /b 0
-)
+:run_current_rajesh
+start "" "RajeshAI.exe"
+exit /b 0
 
-:: ── No EXE — try Python source mode ────────────────────────
-echo Pre-built EXE not found. Trying Python source mode...
+:run_dist_nexply
+cd "dist\Nexply"
+start "" "Nexply.exe"
+exit /b 0
 
-:: Find Python
-set "PY="
-for %%P in (python python3 py) do (
-    if not defined PY (
-        %%P --version >nul 2>&1 && set "PY=%%P"
+:run_dist_rajesh
+cd "dist\RajeshAI"
+start "" "RajeshAI.exe"
+exit /b 0
+
+:run_parent_nexply
+cd ".."
+start "" "Nexply.exe"
+exit /b 0
+
+:run_parent_rajesh
+cd ".."
+start "" "RajeshAI.exe"
+exit /b 0
+
+:run_python
+echo Starting Nexply via Python...
+where python >nul 2>nul
+if %errorlevel% neq 0 (
+    where py >nul 2>nul
+    if %errorlevel% neq 0 (
+        echo [ERROR] Neither Nexply.exe nor Python was found on this system.
+        echo Please ensure Python 3.11+ is installed and on your PATH.
+        pause
+        exit /b 1
+    ) else (
+        set "PY_CMD=py"
     )
+) else (
+    set "PY_CMD=python"
 )
 
-if not defined PY (
-    echo.
-    echo  ╔══════════════════════════════════════════════════╗
-    echo  ║            Nexply — Cannot Start                 ║
-    echo  ╠══════════════════════════════════════════════════╣
-    echo  ║  Neither the pre-built EXE nor Python was found. ║
-    echo  ║                                                  ║
-    echo  ║  Options:                                        ║
-    echo  ║  1. Use the EXE: dist\Nexply\Nexply.exe     ║
-    echo  ║  2. Install Python 3.11+ from python.org         ║
-    echo  ║     then run:  pip install -r requirements.txt   ║
-    echo  ╚══════════════════════════════════════════════════╝
-    echo.
+if not exist "gui_app.py" (
+    echo [ERROR] Could not find gui_app.py in %CD%
     pause
     exit /b 1
 )
 
-:: Check gui_app.py exists here
-if not exist "%HERE%\gui_app.py" (
-    echo Could not find gui_app.py in: %HERE%
-    echo Place this file next to gui_app.py or the Nexply.exe
-    pause
-    exit /b 1
-)
-
-:: Install dependencies if needed
-if exist "%HERE%\requirements.txt" (
-    echo Checking dependencies...
-    %PY% -m pip install -q -r "%HERE%\requirements.txt" --no-warn-script-location
-)
-
-:: Launch from Python source
-echo Launching Nexply from source...
-start "" /D "%HERE%" %PY% -X utf8 "%HERE%\gui_app.py"
+start "" %PY_CMD% -X utf8 gui_app.py
 exit /b 0
