@@ -370,3 +370,11 @@ class DailyPipeline:
             return json.loads(value)
         except Exception:
             return []
+
+    # Step aliases
+    step_hunt = run_hunt
+    step_analyze = run_analyze
+    step_match = run_match
+    step_tailor = run_tailor
+    step_apply = run_apply
+    run = run_all

@@ -224,7 +224,7 @@ def apply(ctx: click.Context, dry_run: bool, job_id: int | None) -> None:
 @cli.command("run")
 @click.option("--dry-run", is_flag=True, help="Full pipeline without submitting applications")
 @click.pass_context
-def run_all(ctx: click.Context, dry_run: bool) -> None:
+def run(ctx: click.Context, dry_run: bool) -> None:
     """🚀 Run the complete pipeline: hunt→analyze→match→tailor→apply."""
     from agent.orchestrator import DailyPipeline
     pipeline = DailyPipeline(dry_run=dry_run)

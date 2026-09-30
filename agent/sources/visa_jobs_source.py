@@ -37,9 +37,9 @@ VISA_KEYWORDS = [
     "relocation assistance", "we cover relocation",
 
     # Work permit — any country
-    "work permit", "work visa", "work authorization",
-    "right to work", "we arrange work permit",
-    "permit sponsorship", "work permit sponsored",
+    "work permit sponsorship", "work visa", "work permit sponsored",
+    "we arrange work permit", "permit sponsorship",
+    "work authorization sponsorship", "work authorization sponsored",
 
     # International / open to candidates worldwide
     "open to international", "international candidates welcome",
@@ -108,17 +108,20 @@ VISA_KEYWORDS = [
 
 # Negative signals — explicitly NOT sponsoring
 NEGATIVE_KEYWORDS = [
-    "no sponsorship", "no visa sponsorship", "not sponsor",
-    "unable to sponsor", "cannot sponsor", "can't sponsor",
-    "sponsorship not available", "sponsorship not offered",
-    "no work permit", "no immigration support",
+    "no sponsorship", "no visa sponsorship", "not sponsor", "does not sponsor",
+    "will not sponsor", "not provide sponsorship", "unable to sponsor",
+    "cannot sponsor", "can't sponsor", "sponsorship not available",
+    "sponsorship not offered", "sponsorship is not available",
+    "sponsorship is not offered", "no work permit", "no immigration support",
     "must be authorized to work", "must have authorization",
+    "must have work authorization", "must have valid work authorization",
+    "must have existing work authorization", "existing work authorization",
     "must already be authorized", "must be eligible to work",
-    "must hold valid work authorization",
-    "citizen or permanent resident only",
-    "citizens only", "permanent residents only",
-    "no relocation", "not eligible for sponsorship",
-    "no visa support",
+    "must hold valid work authorization", "valid work authorization required",
+    "work authorization required", "citizen or permanent resident only",
+    "citizens only", "permanent residents only", "no relocation",
+    "not eligible for sponsorship", "no visa support", "without sponsorship",
+    "not offer sponsorship", "unwilling to sponsor",
 ]
 
 # Country hints for smart detection (word → country label)

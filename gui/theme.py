@@ -113,3 +113,16 @@ def recommendation_color(rec: str) -> str:
         "stretch":      SCORE_STRETCH,
         "skip":         SCORE_SKIP,
     }.get(rec, TEXT_SECONDARY)
+
+
+# ============================================================
+# ALIASES — for backwards compatibility with any view files
+# ============================================================
+CARD_BG  = BG_CARD          # alias
+SUCCESS  = ACCENT_SECONDARY  # mint green
+WARNING  = SCORE_STRETCH     # orange
+DANGER   = ACCENT_PINK       # hot pink
+INFO     = ACCENT_BLUE       # sky blue
+
+FONT_LARGE  = FONT_HEADING   # (Segoe UI, 14, bold)
+FONT_MEDIUM = FONT_SUBHEAD   # (Segoe UI, 12, bold)
