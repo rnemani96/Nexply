@@ -1,5 +1,5 @@
 """
-RAJESH AI - Wellfound (AngelList) Source
+NEXPLY - Wellfound (AngelList) Source
 Scrapes startup and remote job listings from Wellfound.com
 """
 from __future__ import annotations

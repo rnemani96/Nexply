@@ -1,5 +1,5 @@
 """
-RAJESH AI - Himalayas Source
+NEXPLY - Himalayas Source
 Fetches remote jobs from https://himalayas.app/jobs/api
 """
 from __future__ import annotations

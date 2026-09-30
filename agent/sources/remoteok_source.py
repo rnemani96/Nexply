@@ -1,5 +1,5 @@
 """
-RAJESH AI - RemoteOK Source
+NEXPLY - RemoteOK Source
 Fetches remote job listings from https://remoteok.com/api using tag-based queries.
 
 API notes:

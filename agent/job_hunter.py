@@ -1,5 +1,5 @@
 """
-RAJESH AI - JOB HUNTER v2.0
+NEXPLY - JOB HUNTER v2.0
 Plugin-based job scraper supporting multiple sources.
 """
 from __future__ import annotations

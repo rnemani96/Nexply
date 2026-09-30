@@ -1,5 +1,5 @@
 """
-RAJESH AI - Base Job Source
+NEXPLY - Base Job Source
 Abstract interface that all job source plugins must implement.
 """
 from __future__ import annotations

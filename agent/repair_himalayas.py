@@ -64,7 +64,7 @@ def fetch_job_by_guid(guid):
         },
         timeout=30,
         headers={
-            "User-Agent": "RajeshAI-JobAgent/0.1"
+            "User-Agent": "Nexply-JobAgent/0.1"
         }
     )
 
@@ -152,7 +152,7 @@ def repair_job(connection, old_row, job):
 
 def main():
     print("=" * 60)
-    print("RAJESH AI - HIMALAYAS DATABASE REPAIR")
+    print("NEXPLY - HIMALAYAS DATABASE REPAIR")
     print("=" * 60)
 
     connection = get_connection()

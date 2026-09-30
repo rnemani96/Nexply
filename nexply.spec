@@ -1,10 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 """
-PyInstaller spec for RAJESH AI - Autonomous Job Applier
+PyInstaller spec for NEXPLY - Autonomous Job Applier
 Builds a self-contained Windows executable.
 
 Usage:
-    pyinstaller rajesh_ai.spec
+    pyinstaller nexply.spec
 Or use the helper:
     python build.py
 """
@@ -200,7 +200,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="RajeshAI",
+    name="Nexply",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -223,5 +223,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name="RajeshAI",
+    name="Nexply",
 )

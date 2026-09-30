@@ -1,5 +1,5 @@
 """
-RAJESH AI - Remote First Jobs Source
+NEXPLY - Remote First Jobs Source
 Fetches remote-first job listings from https://remotefirstjobs.com/api/jobs.
 
 The Remote First Jobs API is free and requires no authentication.

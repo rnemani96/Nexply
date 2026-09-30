@@ -1,5 +1,5 @@
 """
-RAJESH AI - APPLICATION ENGINE v2.0
+NEXPLY - APPLICATION ENGINE v2.0
 Browser automation for submitting job applications via Playwright.
 
 Supported platforms:

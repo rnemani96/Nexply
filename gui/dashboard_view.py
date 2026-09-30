@@ -1,5 +1,5 @@
 """
-RAJESH AI GUI - Dashboard View
+NEXPLY GUI - Dashboard View
 Beautiful stats cards, pipeline funnel chart, and top matches table.
 """
 from __future__ import annotations

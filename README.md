@@ -1,4 +1,4 @@
-# 🤖 RAJESH AI — Autonomous Job Applier
+# 🤖 NEXPLY — Autonomous Job Applier
 
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
 ![Windows](https://img.shields.io/badge/OS-Windows-green)

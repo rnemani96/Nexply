@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 # ============================================================
-# Rajesh AI - Atomic Requirement Extractor v0.6
+# Nexply - Atomic Requirement Extractor v0.6
 # ============================================================
 # Purpose:
 #   Convert raw job descriptions into structured,
@@ -1164,7 +1164,7 @@ def print_job_summary(job):
 
 def main():
     print("=" * 78)
-    print("RAJESH AI - ATOMIC REQUIREMENT EXTRACTOR v0.6")
+    print("NEXPLY - ATOMIC REQUIREMENT EXTRACTOR v0.6")
     print("=" * 78)
     print(f"Database : {DB_PATH}")
     print(f"Output   : {OUTPUT_PATH}")

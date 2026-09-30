@@ -1,5 +1,5 @@
 """
-Rajesh AI - Resume Formatter
+Nexply - Resume Formatter
 Adapts master resume format based on target job location.
 Templates: india | us | uk | eu
 

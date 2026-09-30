@@ -1,5 +1,5 @@
 """
-RAJESH AI GUI - Settings View
+NEXPLY GUI - Settings View
 Live-editable configuration panel for all settings.
 Changes are saved immediately to config/settings.yaml.
 """

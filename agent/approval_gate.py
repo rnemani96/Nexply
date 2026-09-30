@@ -1,5 +1,5 @@
 """
-RAJESH AI - APPROVAL GATE
+NEXPLY - APPROVAL GATE
 Rich CLI prompt for human review before submitting a job application.
 
 Shows:

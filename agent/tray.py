@@ -1,5 +1,5 @@
 """
-RAJESH AI - System Tray Icon
+NEXPLY - System Tray Icon
 Runs in background, scans every 30 minutes, shows notifications.
 
 Features:
@@ -100,7 +100,7 @@ class TrayManager:
             return
 
         menu = pystray.Menu(
-            pystray.MenuItem("🤖  RAJESH AI", None, enabled=False),
+            pystray.MenuItem("🤖  NEXPLY", None, enabled=False),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("📂  Open Dashboard", self._menu_open, default=True),
             pystray.Menu.SEPARATOR,
@@ -120,9 +120,9 @@ class TrayManager:
         )
 
         self._icon = pystray.Icon(
-            name="RajeshAI",
+            name="Nexply",
             icon=icon_image,
-            title="RAJESH AI — Autonomous Job Applier",
+            title="NEXPLY — Autonomous Job Applier",
             menu=menu,
         )
 
@@ -141,7 +141,7 @@ class TrayManager:
         status = "paused" if self._paused else "resumed"
         logger.info(f"Auto-scan {status}")
         self._notify(
-            "RAJESH AI",
+            "NEXPLY",
             f"Auto-scan {'paused' if self._paused else 'resumed'}."
         )
 
@@ -183,7 +183,7 @@ class TrayManager:
 
             if count > 0:
                 self._notify(
-                    "RAJESH AI — New Jobs Found!",
+                    "NEXPLY — New Jobs Found!",
                     f"Found {count} new job(s). Open the dashboard to review."
                 )
                 logger.info(f"Auto-scan found {count} new jobs")

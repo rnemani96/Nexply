@@ -1,5 +1,5 @@
 """
-RAJESH AI - DATABASE v2.0
+NEXPLY - DATABASE v2.0
 Upgraded schema with applications, resume_versions, and interactions tables.
 Includes migration from v1 (jobs-only) schema.
 """
@@ -506,7 +506,7 @@ if __name__ == "__main__":
     migrate_v1_to_v2()
 
     print("=" * 50)
-    print("RAJESH AI — DATABASE v2.0")
+    print("NEXPLY — DATABASE v2.0")
     print("=" * 50)
     print(f"Database : {DB_PATH}")
     print(f"Total jobs: {get_job_count()}")

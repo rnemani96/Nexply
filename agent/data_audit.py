@@ -5,7 +5,7 @@ def main():
     connection = get_connection()
 
     print("=" * 70)
-    print("RAJESH AI - JOB DATA AUDIT")
+    print("NEXPLY - JOB DATA AUDIT")
     print("=" * 70)
 
     print()

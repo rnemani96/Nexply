@@ -7,7 +7,7 @@ def main():
     query = '"GenAI Engineer" jobs India'
 
     print("=" * 60)
-    print("RAJESH AI - BROWSER SEARCH DIAGNOSTIC")
+    print("NEXPLY - BROWSER SEARCH DIAGNOSTIC")
     print("=" * 60)
     print(f"Query: {query}")
     print()

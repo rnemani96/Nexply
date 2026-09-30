@@ -1,14 +1,14 @@
 ; ============================================================
-; RAJESH AI — Windows Installer Script (Inno Setup 6)
+; NEXPLY — Windows Installer Script (Inno Setup 6)
 ; Compile with Inno Setup 6: https://jrsoftware.org/isinfo.php
-; Output: dist/installer/RajeshAI_Setup_v3.0.exe
+; Output: dist/installer/Nexply_Setup_v3.0.exe
 ; ============================================================
 
-#define AppName "RAJESH AI"
+#define AppName "NEXPLY"
 #define AppVersion "3.0.0"
 #define AppPublisher "Rajesh"
-#define AppURL "https://github.com/rnemani96/RajeshAI"
-#define AppExeName "RajeshAI.exe"
+#define AppURL "https://github.com/rnemani96/Nexply"
+#define AppExeName "Nexply.exe"
 #define AppDescription "Autonomous Job Applier"
 
 [Setup]
@@ -28,7 +28,7 @@ Compression=lzma2/ultra64
 SolidCompression=yes
 ; Output
 OutputDir=dist\installer
-OutputBaseFilename=RajeshAI_Setup_v{#AppVersion}
+OutputBaseFilename=Nexply_Setup_v{#AppVersion}
 ; UI
 WizardStyle=modern
 WizardResizable=yes
@@ -57,8 +57,8 @@ Name: "startupicon";     Description: "Start {#AppName} with Windows (system tra
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; Main application (the entire dist\RajeshAI folder)
-Source: "dist\RajeshAI\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Main application (the entire dist\Nexply folder)
+Source: "dist\Nexply\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Documentation
 Source: "docs\RAJESH_AI_Documentation.docx"; DestDir: "{app}\docs"; Flags: ignoreversion skipifsourcedoesntexist

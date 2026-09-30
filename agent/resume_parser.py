@@ -198,7 +198,7 @@ def save_profile(profile):
 def main():
 
     print("=" * 70)
-    print("RAJESH AI - RESUME PARSER")
+    print("NEXPLY - RESUME PARSER")
     print("=" * 70)
 
     print()

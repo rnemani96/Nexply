@@ -1,5 +1,5 @@
 """
-RAJESH AI - We Work Remotely Source
+NEXPLY - We Work Remotely Source
 Fetches remote job listings from We Work Remotely RSS feeds.
 
 Feed notes:

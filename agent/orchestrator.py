@@ -1,5 +1,5 @@
 """
-RAJESH AI - ORCHESTRATOR v2.0
+NEXPLY - ORCHESTRATOR v2.0
 Daily pipeline runner that coordinates all components:
   1. Hunt new jobs from all sources
   2. Analyze JDs with AI
@@ -319,7 +319,7 @@ class DailyPipeline:
         """Run the complete pipeline end-to-end."""
         dry_tag = " [DRY RUN]" if self._dry_run else ""
         console.print(f"\n[bold magenta]{'='*55}[/bold magenta]")
-        console.print(f"[bold magenta]  RAJESH AI — DAILY PIPELINE{dry_tag}[/bold magenta]")
+        console.print(f"[bold magenta]  NEXPLY — DAILY PIPELINE{dry_tag}[/bold magenta]")
         console.print(f"[bold magenta]  {datetime.now().strftime('%Y-%m-%d %H:%M')}[/bold magenta]")
         console.print(f"[bold magenta]  AI Provider: {self._ai.active_provider_name()}[/bold magenta]")
         console.print(f"[bold magenta]{'='*55}[/bold magenta]")

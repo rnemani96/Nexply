@@ -1,5 +1,5 @@
 """
-RAJESH AI - Live Dashboard
+NEXPLY - Live Dashboard
 Rich terminal interface showing pipeline status at a glance.
 
 Run: python -m agent.dashboard
@@ -44,13 +44,13 @@ SCORE_COLOR = {
 
 
 class Dashboard:
-    """Rich terminal dashboard for the RajeshAI pipeline."""
+    """Rich terminal dashboard for the Nexply pipeline."""
 
     def show(self) -> None:
         """Render the full dashboard."""
         console.print()
         console.rule(
-            f"[bold magenta]🤖 RAJESH AI DASHBOARD  —  "
+            f"[bold magenta]🤖 NEXPLY DASHBOARD  —  "
             f"{datetime.now().strftime('%A, %d %b %Y  %H:%M')}[/bold magenta]"
         )
         console.print()

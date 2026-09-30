@@ -1,5 +1,5 @@
 """
-RAJESH AI - AI ENGINE v2.0
+NEXPLY - AI ENGINE v2.0
 Multi-provider AI client supporting:
   - Gemini (via google-genai SDK)
   - Ollama  (local, free — http://localhost:11434)
@@ -833,7 +833,7 @@ if __name__ == "__main__":
     import sys
 
     print("=" * 55)
-    print("RAJESH AI — AI ENGINE DIAGNOSTIC")
+    print("NEXPLY — AI ENGINE DIAGNOSTIC")
     print("=" * 55)
 
     engine = get_ai_engine()

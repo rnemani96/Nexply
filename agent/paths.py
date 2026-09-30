@@ -1,5 +1,5 @@
 """
-RAJESH AI - Path Resolver
+NEXPLY - Path Resolver
 Handles paths correctly whether running as source or PyInstaller .exe
 """
 from __future__ import annotations

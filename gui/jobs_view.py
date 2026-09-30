@@ -1,5 +1,5 @@
 """
-RAJESH AI GUI - Jobs View
+NEXPLY GUI - Jobs View
 Filterable, sortable table of all jobs in the database.
 Color-coded by score, source, and status.
 """

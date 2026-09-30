@@ -1,5 +1,5 @@
 """
-RAJESH AI - Scheduler
+NEXPLY - Scheduler
 Windows Task Scheduler integration for daily automated runs.
 Also provides a simple in-process scheduler using the 'schedule' library.
 
@@ -97,8 +97,8 @@ def run_loop(hunt_time: str = "08:00", followup_time: str = "17:00") -> None:
 # WINDOWS TASK SCHEDULER
 # ============================================================
 
-TASK_NAME_PIPELINE = "RajeshAI_DailyPipeline"
-TASK_NAME_FOLLOWUP = "RajeshAI_FollowUp"
+TASK_NAME_PIPELINE = "Nexply_DailyPipeline"
+TASK_NAME_FOLLOWUP = "Nexply_FollowUp"
 
 
 def install_windows_tasks(hunt_time: str = "08:00", followup_time: str = "17:00") -> None:
@@ -135,7 +135,7 @@ def install_windows_tasks(hunt_time: str = "08:00", followup_time: str = "17:00"
 
 
 def remove_windows_tasks() -> None:
-    """Remove RajeshAI scheduled tasks."""
+    """Remove Nexply scheduled tasks."""
     for name in [TASK_NAME_PIPELINE, TASK_NAME_FOLLOWUP]:
         result = subprocess.run(
             f'schtasks /delete /tn "{name}" /f',
@@ -157,7 +157,7 @@ def remove_windows_tasks() -> None:
 @click.option("--hunt-time", default=None, help="Daily pipeline time (HH:MM)")
 @click.option("--followup-time", default=None, help="Follow-up check time (HH:MM)")
 def main(install: bool, remove: bool, hunt_time: str | None, followup_time: str | None) -> None:
-    """RAJESH AI Scheduler — manages daily automation."""
+    """NEXPLY Scheduler — manages daily automation."""
     settings = _load_settings()
     sched_cfg = settings.get("scheduler", {})
 

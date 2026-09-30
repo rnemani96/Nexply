@@ -1,5 +1,5 @@
 """
-RAJESH AI GUI - Theme & Style Constants
+NEXPLY GUI - Theme & Style Constants
 Beautiful dark purple/blue theme for the Job Applier application.
 """
 from __future__ import annotations

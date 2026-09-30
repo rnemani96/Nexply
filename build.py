@@ -1,5 +1,5 @@
 """
-RAJESH AI - Build Script
+NEXPLY - Build Script
 Creates a standalone Windows EXE using PyInstaller.
 
 Usage:
@@ -8,12 +8,12 @@ Usage:
     python build.py --clean      # Clean previous build first
 
 Output:
-    dist/RajeshAI/              -- Folder with EXE + all deps
-    dist/RajeshAI/RajeshAI.exe  -- The main executable
+    dist/Nexply/              -- Folder with EXE + all deps
+    dist/Nexply/Nexply.exe  -- The main executable
 
 After building:
-    1. Copy dist/RajeshAI/ anywhere you want
-    2. Run RajeshAI.exe
+    1. Copy dist/Nexply/ anywhere you want
+    2. Run Nexply.exe
     3. First run creates config/, data/, resume/ next to the exe
 """
 from __future__ import annotations
@@ -26,7 +26,7 @@ import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-DIST = ROOT / "dist" / "RajeshAI"
+DIST = ROOT / "dist" / "Nexply"
 BUILD = ROOT / "build"
 
 
@@ -89,12 +89,12 @@ VSVersionInfo(
     StringFileInfo([
       StringTable(
         u'040904B0',
-        [StringStruct(u'CompanyName', u'Rajesh AI'),
+        [StringStruct(u'CompanyName', u'Nexply'),
          StringStruct(u'FileDescription', u'Autonomous Job Applier'),
          StringStruct(u'FileVersion', u'3.0.0.0'),
-         StringStruct(u'InternalName', u'RajeshAI'),
-         StringStruct(u'OriginalFilename', u'RajeshAI.exe'),
-         StringStruct(u'ProductName', u'Rajesh AI - Job Applier'),
+         StringStruct(u'InternalName', u'Nexply'),
+         StringStruct(u'OriginalFilename', u'Nexply.exe'),
+         StringStruct(u'ProductName', u'Nexply - Job Applier'),
          StringStruct(u'ProductVersion', u'3.0.0.0')])
     ]),
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
@@ -130,12 +130,12 @@ def post_process():
     # Create a README next to the EXE
     readme = DIST / "README.txt"
     readme.write_text(
-        "RAJESH AI - Autonomous Job Applier v3.0\n"
+        "NEXPLY - Autonomous Job Applier v3.0\n"
         "=" * 42 + "\n\n"
         "FIRST RUN:\n"
         "  1. Put your master_resume.docx in the resume/ folder\n"
         "  2. Edit config/settings.yaml to set your AI provider\n"
-        "  3. Run RajeshAI.exe\n\n"
+        "  3. Run Nexply.exe\n\n"
         "AI PROVIDERS (free):\n"
         "  - Ollama: Install from https://ollama.com → ollama pull llama3.1\n"
         "  - Gemini: Set GEMINI_API_KEY environment variable\n\n"
@@ -156,7 +156,7 @@ def post_process():
 
 
 def build(debug: bool = False):
-    print("🔨 Building RAJESH AI EXE...\n")
+    print("🔨 Building NEXPLY EXE...\n")
 
     create_icon()
     create_version_file()
@@ -164,7 +164,7 @@ def build(debug: bool = False):
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--clean",
-        str(ROOT / "rajesh_ai.spec"),
+        str(ROOT / "nexply.spec"),
     ]
 
     if debug:
@@ -181,7 +181,7 @@ def build(debug: bool = False):
 
     post_process()
 
-    exe_path = DIST / "RajeshAI.exe"
+    exe_path = DIST / "Nexply.exe"
     size_mb = sum(f.stat().st_size for f in DIST.rglob("*") if f.is_file()) / (1024 * 1024)
 
     print(f"\n{'='*60}")
@@ -198,7 +198,7 @@ def build(debug: bool = False):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Build RAJESH AI EXE")
+    parser = argparse.ArgumentParser(description="Build NEXPLY EXE")
     parser.add_argument("--clean", action="store_true", help="Clean previous build first")
     parser.add_argument("--debug", action="store_true", help="Build with console for debugging")
     args = parser.parse_args()

@@ -1,5 +1,5 @@
 """
-RAJESH AI - Pipeline Tracker
+NEXPLY - Pipeline Tracker
 Manages job pipeline status transitions and follow-up scheduling.
 """
 from __future__ import annotations

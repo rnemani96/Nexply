@@ -1,5 +1,5 @@
 """
-RAJESH AI GUI - Application Queue View
+NEXPLY GUI - Application Queue View
 Review tailored jobs, preview resume details, approve/skip/blacklist.
 """
 from __future__ import annotations

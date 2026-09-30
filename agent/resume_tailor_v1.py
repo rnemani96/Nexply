@@ -1,5 +1,5 @@
 """
-RAJESH AI - RESUME TAILOR v1.0
+NEXPLY - RESUME TAILOR v1.0
 
 Purpose:
     Create a job-specific resume from the master resume without
@@ -1205,7 +1205,7 @@ def create_report(
 def main():
 
     print("=" * 72)
-    print("RAJESH AI - RESUME TAILOR v1.0")
+    print("NEXPLY - RESUME TAILOR v1.0")
     print("=" * 72)
 
     # --------------------------------------------------------

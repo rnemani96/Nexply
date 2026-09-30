@@ -1,5 +1,5 @@
 """
-RAJESH AI - Job Location Filter
+NEXPLY - Job Location Filter
 Smart filter that enforces the rule:
 
   "If a job is from a foreign country (not India / not Remote / not Worldwide)

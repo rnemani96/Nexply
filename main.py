@@ -1,5 +1,5 @@
 """
-RAJESH AI - Autonomous Job Applier v2.0
+NEXPLY - Autonomous Job Applier v2.0
 Main CLI entry point.
 
 Usage:
@@ -58,7 +58,7 @@ def setup_logging(verbose: bool = False) -> None:
         level=level,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         handlers=[
-            logging.FileHandler(log_dir / "rajesh_ai.log", encoding="utf-8"),
+            logging.FileHandler(log_dir / "nexply.log", encoding="utf-8"),
             logging.StreamHandler(sys.stdout) if verbose else logging.NullHandler(),
         ],
     )
@@ -74,7 +74,7 @@ def setup_logging(verbose: bool = False) -> None:
               help="Override AI provider", default=None)
 @click.pass_context
 def cli(ctx: click.Context, verbose: bool, provider: str | None) -> None:
-    """🤖 RAJESH AI — Autonomous Job Applier"""
+    """🤖 NEXPLY — Autonomous Job Applier"""
     setup_logging(verbose)
     ctx.ensure_object(dict)
     ctx.obj["provider"] = provider
@@ -315,7 +315,7 @@ def ai_status(ctx: click.Context) -> None:
 @click.pass_context
 def setup(ctx: click.Context) -> None:
     """⚙️ First-time setup: install deps, configure DB, check AI."""
-    console.print("\n[bold cyan]RAJESH AI — Setup[/bold cyan]\n")
+    console.print("\n[bold cyan]NEXPLY — Setup[/bold cyan]\n")
 
     # 1. Initialize database
     console.print("1. Initializing database...")

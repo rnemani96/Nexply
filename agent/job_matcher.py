@@ -537,7 +537,7 @@ def get_jobs():
 def main():
 
     print("=" * 70)
-    print("RAJESH AI - EXPLAINABLE JOB MATCHER")
+    print("NEXPLY - EXPLAINABLE JOB MATCHER")
     print("=" * 70)
 
     if not PROFILE_PATH.exists():

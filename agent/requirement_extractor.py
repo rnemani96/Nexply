@@ -680,7 +680,7 @@ def extract_job(job):
 
 
 def main():
-    print("RAJESH AI - ATOMIC REQUIREMENT EXTRACTOR v0.8")
+    print("NEXPLY - ATOMIC REQUIREMENT EXTRACTOR v0.8")
     print("Database :", DB_PATH)
     print("Output   :", OUTPUT_PATH)
 

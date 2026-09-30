@@ -1,5 +1,5 @@
 """
-RAJESH AI - Naukri Source
+NEXPLY - Naukri Source
 Scrapes Indian job listings from Naukri.com
 """
 from __future__ import annotations

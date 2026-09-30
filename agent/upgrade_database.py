@@ -19,7 +19,7 @@ def main():
     connection = get_connection()
 
     print("=" * 70)
-    print("RAJESH AI - DATABASE UPGRADE")
+    print("NEXPLY - DATABASE UPGRADE")
     print("=" * 70)
 
     add_column_if_missing(

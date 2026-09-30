@@ -3,7 +3,7 @@ from playwright.sync_api import sync_playwright
 
 def main():
     print("=" * 50)
-    print("RAJESH AI - BROWSER TEST")
+    print("NEXPLY - BROWSER TEST")
     print("=" * 50)
 
     with sync_playwright() as p:

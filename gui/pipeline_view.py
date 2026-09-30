@@ -1,5 +1,5 @@
 """
-RAJESH AI GUI - Pipeline View
+NEXPLY GUI - Pipeline View
 Run each pipeline stage from the GUI with live log output.
 Hunt → Analyze → Match → Tailor → Apply
 """

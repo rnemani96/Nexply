@@ -1,5 +1,5 @@
 """
-RAJESH AI - Visa-Sponsoring Job Source
+NEXPLY - Visa-Sponsoring Job Source
 Searches multiple boards specifically for jobs that offer visa sponsorship.
 Covers ALL countries: US, UK, EU, Canada, Australia, Germany, Singapore,
 UAE, Netherlands, Ireland, New Zealand, Japan, Sweden, Denmark + anywhere else.
@@ -279,7 +279,7 @@ class VisaJobsSource(BaseJobSource):
         jobs = []
         visa_tags = ["h1b", "visa", "relocation"]
         client = httpx.Client(
-            headers={"User-Agent": "Mozilla/5.0 RajeshAI/3.0"},
+            headers={"User-Agent": "Mozilla/5.0 Nexply/3.0"},
             timeout=20,
             follow_redirects=True,
         )
@@ -421,7 +421,7 @@ class VisaJobsSource(BaseJobSource):
                 resp = httpx.get(
                     f"https://www.h1bjobs.com/search?q={query}&format=rss",
                     timeout=15,
-                    headers={"User-Agent": "Mozilla/5.0 RajeshAI/3.0"},
+                    headers={"User-Agent": "Mozilla/5.0 Nexply/3.0"},
                     follow_redirects=True,
                 )
                 if resp.status_code != 200:
@@ -523,7 +523,7 @@ class VisaJobsSource(BaseJobSource):
                     f"https://himalayas.app/jobs/api",
                     params={"q": term, "limit": 100},
                     timeout=20,
-                    headers={"User-Agent": "Mozilla/5.0 RajeshAI/3.0"},
+                    headers={"User-Agent": "Mozilla/5.0 Nexply/3.0"},
                     follow_redirects=True,
                 )
                 resp.raise_for_status()

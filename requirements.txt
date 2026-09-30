@@ -1,5 +1,5 @@
 # ============================================================
-# RAJESH AI - AUTONOMOUS JOB APPLIER
+# NEXPLY - AUTONOMOUS JOB APPLIER
 # Requirements
 # ============================================================
 

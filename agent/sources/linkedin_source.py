@@ -1,5 +1,5 @@
 """
-RAJESH AI - LinkedIn Source
+NEXPLY - LinkedIn Source
 Scrapes LinkedIn Easy Apply jobs using Playwright.
 
 Setup: Set LINKEDIN_SESSION_COOKIE env var with your li_at cookie value.

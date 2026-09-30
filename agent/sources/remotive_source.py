@@ -1,5 +1,5 @@
 """
-RAJESH AI - Remotive Source
+NEXPLY - Remotive Source
 Fetches remote job listings from https://remotive.com/api/remote-jobs.
 
 API notes:

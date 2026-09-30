@@ -30,7 +30,7 @@ def load_candidate_config():
 
 def print_profile(profile):
     print("=" * 70)
-    print("RAJESH AI - CANDIDATE PROFILE")
+    print("NEXPLY - CANDIDATE PROFILE")
     print("=" * 70)
 
     print()

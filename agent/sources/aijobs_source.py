@@ -1,5 +1,5 @@
 """
-RAJESH AI - ai-jobs.net Source
+NEXPLY - ai-jobs.net Source
 Fetches AI/ML specialist job listings from https://ai-jobs.net via RSS feed.
 Falls back to the JSON endpoint if the RSS feed is unavailable.
 """

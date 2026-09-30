@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 # ============================================================
-# RAJESH AI - JOB MATCHER v1.0
+# NEXPLY - JOB MATCHER v1.0
 # ============================================================
 # Uses:
 #   data/jobs.db
@@ -1933,7 +1933,7 @@ def main():
 
     print()
     print("=" * 70)
-    print("RAJESH AI - JOB MATCHER v1.0")
+    print("NEXPLY - JOB MATCHER v1.0")
     print("=" * 70)
     print()
 

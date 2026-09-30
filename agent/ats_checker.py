@@ -1,5 +1,5 @@
 """
-Rajesh AI - ATS Checker
+Nexply - ATS Checker
 Scores a generated resume for ATS (Applicant Tracking System) compatibility.
 
 Inputs:

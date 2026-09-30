@@ -1,5 +1,5 @@
 """
-RAJESH AI - Main GUI Application
+NEXPLY - Main GUI Application
 Beautiful dark-themed desktop app for the Autonomous Job Applier.
 
 Run:
@@ -118,7 +118,7 @@ class StatusBar(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self,
-            text="RAJESH AI v3.0",
+            text="NEXPLY v3.0",
             font=ctk.CTkFont(family=FONT_FAMILY, size=10, weight="bold"),
             text_color=TEXT_DIM,
         ).pack(side="right", padx=8)
@@ -146,7 +146,7 @@ class StatusBar(ctk.CTkFrame):
 # MAIN APPLICATION WINDOW
 # ============================================================
 
-class RajeshAIApp(ctk.CTk):
+class NexplyApp(ctk.CTk):
     """Main application window with sidebar navigation."""
 
     NAV_ITEMS = [
@@ -160,7 +160,7 @@ class RajeshAIApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("RAJESH AI — Autonomous Job Applier")
+        self.title("NEXPLY — Autonomous Job Applier")
         self.geometry("1400x900")
         self.minsize(1100, 700)
         self.configure(fg_color=BG_PRIMARY)
@@ -254,7 +254,7 @@ class RajeshAIApp(ctk.CTk):
 
         ctk.CTkLabel(
             brand,
-            text="RAJESH AI",
+            text="NEXPLY",
             font=ctk.CTkFont(family=FONT_FAMILY, size=14, weight="bold"),
             text_color=ACCENT_PRIMARY,
         ).pack()
@@ -420,10 +420,10 @@ class RajeshAIApp(ctk.CTk):
             try:
                 if self._tray._icon:
                     self._tray._icon.notify(
-                        "RAJESH AI is still running in the background.\n"
+                        "NEXPLY is still running in the background.\n"
                         "Scanning for jobs every 30 minutes.\n"
                         "Right-click the tray icon to open or quit.",
-                        "RAJESH AI minimized to tray",
+                        "NEXPLY minimized to tray",
                     )
             except Exception:
                 pass
@@ -500,7 +500,7 @@ class SplashScreen(ctk.CTkToplevel):
         ctk.CTkLabel(self, text="🤖", font=ctk.CTkFont(size=60)).pack(pady=(40, 8))
         ctk.CTkLabel(
             self,
-            text="RAJESH AI",
+            text="NEXPLY",
             font=ctk.CTkFont(family=FONT_FAMILY, size=28, weight="bold"),
             text_color=ACCENT_PRIMARY,
         ).pack()
@@ -551,7 +551,7 @@ class SplashScreen(ctk.CTkToplevel):
 # ============================================================
 
 def run_gui():
-    """Launch the Rajesh AI GUI application."""
+    """Launch the Nexply GUI application."""
     # Initialize DB first
     try:
         from agent.database import initialize_database, migrate_v1_to_v2
@@ -560,7 +560,7 @@ def run_gui():
     except Exception as e:
         print(f"DB init warning: {e}")
 
-    app = RajeshAIApp()
+    app = NexplyApp()
 
     # Show splash
     splash = SplashScreen()

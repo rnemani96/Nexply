@@ -1,5 +1,5 @@
 """
-RAJESH AI - Jobicy Source
+NEXPLY - Jobicy Source
 Fetches remote job listings from https://jobicy.com/api/v2/remote-jobs.
 
 API notes:
