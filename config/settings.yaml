@@ -6,28 +6,47 @@ project:
 # AI PROVIDER CONFIG
 # ============================================================
 ai:
-  provider: "ollama"            # gemini | ollama | lmstudio
+  # Primary provider to use first.
+  # Options: ollama | lmstudio | groq | gemini
+  provider: "ollama"
 
-  gemini:
-    jd_analysis_model: "gemini-3.8-flash"
-    resume_model: "gemini-3.1-pro-preview"
-    enabled: true
+  # When primary hits rate limit or is unavailable, try these in order.
+  # offline-first default: local → online fallback
+  fallback_chain: ["ollama", "lmstudio", "groq", "gemini"]
+
+  # ---- OFFLINE (local) providers — no API key, no rate limit ----
 
   ollama:
     base_url: "http://localhost:11434"
-    jd_analysis_model: "llama3.1"
+    jd_analysis_model: "llama3.1"        # run: ollama pull llama3.1
     resume_model: "llama3.1"
     timeout_seconds: 120
     enabled: true
 
   lmstudio:
     base_url: "http://localhost:1234/v1"
-    jd_analysis_model: "local-model"
+    jd_analysis_model: "local-model"     # whatever model is loaded in LM Studio
     resume_model: "local-model"
     timeout_seconds: 180
-    enabled: false
+    enabled: false                        # enable when LM Studio is running
 
-  fallback_chain: ["ollama", "gemini"]
+  # ---- ONLINE (cloud) providers — free tiers, auto rate-limit failover ----
+
+  groq:
+    # Free: 30 RPM / 6000 RPD. Get key at https://console.groq.com (free)
+    # Set env var: GROQ_API_KEY=gsk_...
+    model: "llama-3.1-70b-versatile"     # fastest free model
+    timeout_seconds: 60
+    enabled: true
+    # Rate limit: auto-detected, 65s cooldown then retries automatically
+
+  gemini:
+    # Free: 15 RPM / 1M tokens/day. Get key at https://aistudio.google.com
+    # Set env var: GEMINI_API_KEY=AIza...
+    jd_analysis_model: "gemini-2.0-flash"
+    resume_model: "gemini-2.0-flash"
+    enabled: true
+    # Rate limit: auto-detected, 70s cooldown then retries automatically
 
 # ============================================================
 # CANDIDATE PROFILE

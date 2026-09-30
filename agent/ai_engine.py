@@ -173,18 +173,58 @@ class BaseAIProvider(ABC):
 
 
 # ============================================================
+# RATE LIMIT AWARE MIXIN
+# ============================================================
+
+class RateLimitMixin:
+    """
+    Mixin that tracks rate-limit cooldowns per provider instance.
+    When a rate limit is hit, the provider is marked unavailable
+    for `cooldown_seconds`. After that it becomes available again.
+    """
+
+    _rl_until: float = 0.0       # epoch-seconds when cooldown expires
+    _rl_cooldown: float = 60.0   # default cooldown window
+
+    def mark_rate_limited(self, cooldown_seconds: float | None = None) -> None:
+        secs = cooldown_seconds if cooldown_seconds is not None else self._rl_cooldown
+        self._rl_until = time.time() + secs
+        logger.warning(
+            f"[{getattr(self,'name','?')}] Rate-limited. "
+            f"Cooldown: {secs:.0f}s — next attempt after {secs:.0f}s."
+        )
+
+    def is_rate_limited(self) -> bool:
+        return time.time() < self._rl_until
+
+    def cooldown_remaining(self) -> float:
+        return max(0.0, self._rl_until - time.time())
+
+    @staticmethod
+    def _is_rate_limit_error(exc: Exception) -> bool:
+        """Detect rate-limit responses from any provider."""
+        msg = str(exc).lower()
+        return any(kw in msg for kw in [
+            "429", "rate limit", "rate_limit", "quota", "resource_exhausted",
+            "too many requests", "ratelimit", "capacity", "overloaded",
+            "resource exhausted", "limit exceeded", "billing",
+        ])
+
+
+# ============================================================
 # GEMINI PROVIDER
 # ============================================================
 
-class GeminiProvider(BaseAIProvider):
-    """Google Gemini via the official google-genai SDK."""
+class GeminiProvider(RateLimitMixin, BaseAIProvider):
+    """Google Gemini via the official google-genai SDK (online, free tier)."""
 
     name = "gemini"
+    _rl_cooldown = 70.0   # Gemini free: 15 RPM → ~60s cooldown
 
     def __init__(self, settings: dict):
         self._settings = settings.get("ai", {}).get("gemini", {})
-        self._jd_model = self._settings.get("jd_analysis_model", "gemini-3.8-flash")
-        self._resume_model = self._settings.get("resume_model", "gemini-3.1-pro-preview")
+        self._jd_model     = self._settings.get("jd_analysis_model",  "gemini-2.0-flash")
+        self._resume_model = self._settings.get("resume_model",        "gemini-2.0-flash")
         self._client = None
 
     def _get_client(self):
@@ -202,6 +242,8 @@ class GeminiProvider(BaseAIProvider):
         return self._client
 
     def is_available(self) -> bool:
+        if self.is_rate_limited():
+            return False
         try:
             api_key = os.environ.get("GEMINI_API_KEY", "")
             if not api_key:
@@ -214,31 +256,114 @@ class GeminiProvider(BaseAIProvider):
     def chat(self, system: str, user: str, *, json_mode: bool = False) -> str:
         client = self._get_client()
         try:
-            interaction = client.interactions.create(
-                model=self._jd_model,
+            from google.genai import types as gtypes
+            config = gtypes.GenerateContentConfig(
                 system_instruction=system,
-                input=user,
+                temperature=0.1,
+                response_mime_type="application/json" if json_mode else "text/plain",
             )
-            return interaction.output_text or ""
+            response = client.models.generate_content(
+                model=self._jd_model,
+                contents=user,
+                config=config,
+            )
+            return response.text or ""
         except Exception as e:
+            if self._is_rate_limit_error(e):
+                self.mark_rate_limited()
             logger.error(f"Gemini chat error: {e}")
             raise
 
 
 # ============================================================
-# OLLAMA PROVIDER
+# GROQ PROVIDER (Free online — fast inference)
 # ============================================================
 
-class OllamaProvider(BaseAIProvider):
-    """Local Ollama server (http://localhost:11434)."""
+class GroqProvider(RateLimitMixin, BaseAIProvider):
+    """
+    Groq Cloud — free tier, very fast (llama3.1, mixtral, gemma).
+    API is OpenAI-compatible. Free tier: 30 RPM / 6000 RPD.
+    Get API key free at: https://console.groq.com
+    Set env var: GROQ_API_KEY
+    """
+
+    name = "groq"
+    _rl_cooldown = 65.0   # 30 RPM free tier → ~60s cooldown is safe
+
+    MODELS = [
+        "llama-3.1-70b-versatile",
+        "llama-3.1-8b-instant",
+        "mixtral-8x7b-32768",
+        "gemma2-9b-it",
+    ]
+
+    def __init__(self, settings: dict):
+        cfg = settings.get("ai", {}).get("groq", {})
+        self._api_key  = os.environ.get("GROQ_API_KEY", cfg.get("api_key", ""))
+        self._model    = cfg.get("model", "llama-3.1-70b-versatile")
+        self._base_url = "https://api.groq.com/openai/v1"
+        self._timeout  = cfg.get("timeout_seconds", 60)
+
+    def is_available(self) -> bool:
+        if self.is_rate_limited():
+            return False
+        return bool(self._api_key)
+
+    def chat(self, system: str, user: str, *, json_mode: bool = False) -> str:
+        if not self._api_key:
+            raise RuntimeError("GROQ_API_KEY not set.")
+        headers = {
+            "Authorization": f"Bearer {self._api_key}",
+            "Content-Type": "application/json",
+        }
+        payload: dict = {
+            "model": self._model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user",   "content": user},
+            ],
+            "temperature": 0.1,
+            "max_tokens": 4096,
+        }
+        if json_mode:
+            payload["response_format"] = {"type": "json_object"}
+
+        try:
+            resp = httpx.post(
+                f"{self._base_url}/chat/completions",
+                headers=headers,
+                json=payload,
+                timeout=self._timeout,
+            )
+            if resp.status_code == 429:
+                retry_after = float(resp.headers.get("retry-after", self._rl_cooldown))
+                self.mark_rate_limited(retry_after)
+                raise RuntimeError(f"Groq rate limited — retry after {retry_after:.0f}s")
+            resp.raise_for_status()
+            data = resp.json()
+            return data["choices"][0]["message"]["content"]
+        except Exception as e:
+            if self._is_rate_limit_error(e):
+                self.mark_rate_limited()
+            logger.error(f"Groq chat error: {e}")
+            raise
+
+
+# ============================================================
+# OLLAMA PROVIDER (Offline — local)
+# ============================================================
+
+class OllamaProvider(RateLimitMixin, BaseAIProvider):
+    """Local Ollama server (http://localhost:11434) — offline, no rate limit."""
 
     name = "ollama"
+    _rl_cooldown = 0.0   # Local — never rate limited
 
     def __init__(self, settings: dict):
         cfg = settings.get("ai", {}).get("ollama", {})
         self._base_url = cfg.get("base_url", "http://localhost:11434").rstrip("/")
-        self._model = cfg.get("jd_analysis_model", "llama3.1")
-        self._timeout = cfg.get("timeout_seconds", 120)
+        self._model    = cfg.get("jd_analysis_model", "llama3.1")
+        self._timeout  = cfg.get("timeout_seconds", 120)
 
     def is_available(self) -> bool:
         try:
@@ -248,27 +373,23 @@ class OllamaProvider(BaseAIProvider):
             return False
 
     def list_models(self) -> list[str]:
-        """Return locally available model names."""
         try:
             resp = httpx.get(f"{self._base_url}/api/tags", timeout=10.0)
-            data = resp.json()
-            return [m["name"] for m in data.get("models", [])]
+            return [m["name"] for m in resp.json().get("models", [])]
         except Exception:
             return []
 
     def chat(self, system: str, user: str, *, json_mode: bool = False) -> str:
-        """Call Ollama /api/chat endpoint."""
         payload = {
             "model": self._model,
             "messages": [
                 {"role": "system", "content": system},
-                {"role": "user", "content": user},
+                {"role": "user",   "content": user},
             ],
             "stream": False,
         }
         if json_mode:
             payload["format"] = "json"
-
         try:
             resp = httpx.post(
                 f"{self._base_url}/api/chat",
@@ -276,27 +397,21 @@ class OllamaProvider(BaseAIProvider):
                 timeout=self._timeout,
             )
             resp.raise_for_status()
-            data = resp.json()
-            return data.get("message", {}).get("content", "")
+            return resp.json().get("message", {}).get("content", "")
         except httpx.TimeoutException:
             raise TimeoutError(
                 f"Ollama timed out after {self._timeout}s. "
-                "Try a smaller/faster model or increase timeout_seconds in settings.yaml."
+                "Try a smaller model or increase timeout_seconds in settings."
             )
         except Exception as e:
             logger.error(f"Ollama chat error: {e}")
             raise
 
     def pull_model(self, model_name: str) -> None:
-        """Pull a model from Ollama library (streaming progress)."""
         import sys
-        print(f"Pulling model '{model_name}' from Ollama...")
-        with httpx.stream(
-            "POST",
-            f"{self._base_url}/api/pull",
-            json={"name": model_name},
-            timeout=600,
-        ) as resp:
+        print(f"Pulling '{model_name}' from Ollama...")
+        with httpx.stream("POST", f"{self._base_url}/api/pull",
+                          json={"name": model_name}, timeout=600) as resp:
             for line in resp.iter_lines():
                 if line:
                     try:
@@ -307,23 +422,24 @@ class OllamaProvider(BaseAIProvider):
                             sys.stdout.flush()
                     except Exception:
                         pass
-        print(f"\nModel '{model_name}' ready.")
+        print(f"\n'{model_name}' ready.")
 
 
 # ============================================================
-# LM STUDIO PROVIDER (OpenAI-compatible API)
+# LM STUDIO PROVIDER (Offline — OpenAI-compatible)
 # ============================================================
 
-class LMStudioProvider(BaseAIProvider):
-    """LM Studio local server — OpenAI-compatible REST API."""
+class LMStudioProvider(RateLimitMixin, BaseAIProvider):
+    """LM Studio local server — OpenAI-compatible REST API. No rate limit."""
 
     name = "lmstudio"
+    _rl_cooldown = 0.0
 
     def __init__(self, settings: dict):
         cfg = settings.get("ai", {}).get("lmstudio", {})
         self._base_url = cfg.get("base_url", "http://localhost:1234/v1").rstrip("/")
-        self._model = cfg.get("jd_analysis_model", "local-model")
-        self._timeout = cfg.get("timeout_seconds", 180)
+        self._model    = cfg.get("jd_analysis_model", "local-model")
+        self._timeout  = cfg.get("timeout_seconds", 180)
 
     def is_available(self) -> bool:
         try:
@@ -335,25 +451,22 @@ class LMStudioProvider(BaseAIProvider):
     def list_models(self) -> list[str]:
         try:
             resp = httpx.get(f"{self._base_url}/models", timeout=10.0)
-            data = resp.json()
-            return [m["id"] for m in data.get("data", [])]
+            return [m["id"] for m in resp.json().get("data", [])]
         except Exception:
             return []
 
     def chat(self, system: str, user: str, *, json_mode: bool = False) -> str:
-        """Call OpenAI-compatible /chat/completions endpoint."""
         payload: dict[str, Any] = {
             "model": self._model,
             "messages": [
                 {"role": "system", "content": system},
-                {"role": "user", "content": user},
+                {"role": "user",   "content": user},
             ],
             "temperature": 0.1,
             "max_tokens": 4096,
         }
         if json_mode:
             payload["response_format"] = {"type": "json_object"}
-
         try:
             resp = httpx.post(
                 f"{self._base_url}/chat/completions",
@@ -363,13 +476,11 @@ class LMStudioProvider(BaseAIProvider):
             resp.raise_for_status()
             data = resp.json()
             choices = data.get("choices", [])
-            if choices:
-                return choices[0].get("message", {}).get("content", "")
-            return ""
+            return choices[0]["message"]["content"] if choices else ""
         except httpx.TimeoutException:
             raise TimeoutError(
                 f"LM Studio timed out after {self._timeout}s. "
-                "Use a faster model or increase timeout_seconds in settings.yaml."
+                "Use a faster model or increase timeout_seconds."
             )
         except Exception as e:
             logger.error(f"LM Studio chat error: {e}")
@@ -377,61 +488,153 @@ class LMStudioProvider(BaseAIProvider):
 
 
 # ============================================================
-# MULTI-PROVIDER ENGINE (with fallback)
+# MULTI-PROVIDER ENGINE — with rate-limit failover
 # ============================================================
 
 class AIEngine:
     """
-    Unified AI engine with automatic provider selection and fallback.
+    Unified AI engine with automatic provider selection and rate-limit failover.
 
-    Priority:
-      1. Explicitly configured primary provider
-      2. Fallback chain from settings.yaml
-      3. Raises AIEngineError if nothing works
+    Provider priority (configurable in settings.yaml ai.fallback_chain):
+      Default offline-first: ollama → lmstudio → groq → gemini
+      Default online-first:  groq → gemini → ollama → lmstudio
+
+    When any provider hits a rate limit:
+      - It's automatically cooled down for its configured window
+      - The engine instantly shifts to the next available provider
+      - After the cooldown it becomes available again automatically
+      - No manual intervention needed
 
     Usage:
         engine = AIEngine()
         jd = engine.analyze_jd("We're hiring a GenAI Engineer...")
         print(jd.required_skills)
+        print(engine.active_provider_name())
     """
 
     def __init__(self, settings: dict | None = None):
         self._settings = settings or _load_settings()
         self._providers: dict[str, BaseAIProvider] = {
-            "gemini": GeminiProvider(self._settings),
-            "ollama": OllamaProvider(self._settings),
+            "gemini":   GeminiProvider(self._settings),
+            "groq":     GroqProvider(self._settings),
+            "ollama":   OllamaProvider(self._settings),
             "lmstudio": LMStudioProvider(self._settings),
         }
-        self._primary = self._settings.get("ai", {}).get("provider", "ollama")
-        self._fallback_chain: list[str] = self._settings.get("ai", {}).get(
-            "fallback_chain", ["ollama", "gemini"]
+        ai_cfg = self._settings.get("ai", {})
+        self._primary        = ai_cfg.get("provider", "ollama")
+        self._fallback_chain = ai_cfg.get(
+            "fallback_chain", ["ollama", "lmstudio", "groq", "gemini"]
         )
+        self._last_used: str = ""
+
+    def _ordered_chain(self) -> list[str]:
+        """Return full provider list ordered by priority, primary first."""
+        seen = set()
+        chain = []
+        for name in [self._primary] + self._fallback_chain:
+            if name not in seen:
+                seen.add(name)
+                chain.append(name)
+        # Append any remaining providers not in chain
+        for name in self._providers:
+            if name not in seen:
+                chain.append(name)
+        return chain
 
     def _get_active_provider(self) -> BaseAIProvider:
-        """Return the first available provider from the priority list."""
-        chain = [self._primary] + [
-            p for p in self._fallback_chain if p != self._primary
-        ]
+        """
+        Return the first provider that is:
+          1. Configured (in providers dict)
+          2. Not rate-limited
+          3. Available (reachable)
+        Raises AIEngineError if nothing works.
+        """
+        chain = self._ordered_chain()
+        errors = []
+
         for name in chain:
             provider = self._providers.get(name)
-            if provider and provider.is_available():
-                logger.debug(f"Using AI provider: {name}")
+            if not provider:
+                continue
+
+            # Skip if in rate-limit cooldown
+            if hasattr(provider, 'is_rate_limited') and provider.is_rate_limited():
+                remaining = provider.cooldown_remaining()
+                logger.debug(f"[{name}] Skipping — rate limited ({remaining:.0f}s remaining)")
+                errors.append(f"{name}: rate limited ({remaining:.0f}s)")
+                continue
+
+            # Check if reachable
+            if provider.is_available():
+                if self._last_used != name:
+                    logger.info(f"AI provider shifted to: {name}")
+                    self._last_used = name
                 return provider
+            else:
+                errors.append(f"{name}: not available")
+
         raise AIEngineError(
             "No AI provider available!\n"
-            f"Primary: {self._primary} — not reachable.\n"
-            "Fix options:\n"
-            "  • Ollama: install from https://ollama.com then run 'ollama pull llama3.1'\n"
-            "  • LM Studio: enable the local server on port 1234\n"
-            "  • Gemini: set GEMINI_API_KEY environment variable\n"
+            + "\n".join(f"  • {e}" for e in errors)
+            + "\n\nFix options:"
+            "  • Ollama: install from https://ollama.com → run: ollama pull llama3.1\n"
+            "  • LM Studio: enable local server on port 1234\n"
+            "  • Groq (free online): set GROQ_API_KEY from https://console.groq.com\n"
+            "  • Gemini (free online): set GEMINI_API_KEY from https://aistudio.google.com\n"
         )
 
-    def status(self) -> dict[str, bool]:
-        """Check availability of all configured providers."""
-        return {
-            name: provider.is_available()
-            for name, provider in self._providers.items()
-        }
+    def _call_with_failover(self, fn_name: str, *args, **kwargs):
+        """
+        Call a provider method. If it raises a rate-limit error,
+        mark the provider cooled down and retry with the next one.
+        """
+        chain = self._ordered_chain()
+        last_error = None
+
+        for name in chain:
+            provider = self._providers.get(name)
+            if not provider:
+                continue
+            if hasattr(provider, 'is_rate_limited') and provider.is_rate_limited():
+                continue
+            if not provider.is_available():
+                continue
+
+            try:
+                method = getattr(provider, fn_name)
+                result = method(*args, **kwargs)
+                if self._last_used != name:
+                    logger.info(f"AI provider active: {name}")
+                    self._last_used = name
+                return result
+            except Exception as e:
+                if hasattr(provider, '_is_rate_limit_error') and provider._is_rate_limit_error(e):
+                    provider.mark_rate_limited()
+                    logger.warning(f"[{name}] Rate limited — shifting to next provider")
+                    last_error = e
+                    continue
+                else:
+                    # Non-rate-limit error — log and try next
+                    logger.warning(f"[{name}] Error ({type(e).__name__}): {e} — trying next")
+                    last_error = e
+                    continue
+
+        raise AIEngineError(
+            f"All providers failed for '{fn_name}'. Last error: {last_error}"
+        )
+
+    def status(self) -> dict[str, dict]:
+        """Check status of all providers."""
+        result = {}
+        for name, provider in self._providers.items():
+            rl = hasattr(provider, 'is_rate_limited') and provider.is_rate_limited()
+            result[name] = {
+                "available":       provider.is_available(),
+                "rate_limited":    rl,
+                "cooldown_remaining": provider.cooldown_remaining() if rl else 0.0,
+                "type":            "offline" if name in ("ollama", "lmstudio") else "online",
+            }
+        return result
 
     def active_provider_name(self) -> str:
         try:
@@ -440,38 +643,35 @@ class AIEngine:
             return "none"
 
     # --------------------------------------------------------
-    # Public API — delegates to active provider
+    # Public API — all use rate-limit-aware failover
     # --------------------------------------------------------
 
     def analyze_jd(self, description: str) -> JDProfile:
-        return self._get_active_provider().analyze_jd(description)
+        return self._call_with_failover("analyze_jd", description)
 
-    def score_match(
-        self,
-        candidate_profile: dict,
-        jd_profile: JDProfile,
-    ) -> MatchResult:
-        return self._get_active_provider().score_match(candidate_profile, jd_profile)
+    def score_match(self, candidate_profile: dict, jd_profile: JDProfile) -> MatchResult:
+        return self._call_with_failover("score_match", candidate_profile, jd_profile)
 
     def tailor_resume_bullets(
-        self,
-        bullets: list[str],
-        jd_profile: JDProfile,
-        max_bullets: int = 6,
+        self, bullets: list[str], jd_profile: JDProfile, max_bullets: int = 6
     ) -> ResumeRewriteResult:
-        return self._get_active_provider().tailor_resume_bullets(
-            bullets, jd_profile, max_bullets
+        return self._call_with_failover(
+            "tailor_resume_bullets", bullets, jd_profile, max_bullets
         )
 
+    def rewrite_resume_bullets(
+        self, jd_summary: str, required_skills: list[str], candidate_bullets: list[str]
+    ) -> ResumeRewriteResult:
+        """Convenience wrapper for the resume tailor."""
+        from dataclasses import replace as dc_replace
+        jd = JDProfile(required_skills=required_skills, summary=jd_summary)
+        return self.tailor_resume_bullets(candidate_bullets or [""], jd)
+
     def generate_cover_letter(
-        self,
-        candidate_profile: dict,
-        jd_profile: JDProfile,
-        job_title: str,
-        company: str,
+        self, candidate_profile: dict, jd_profile: JDProfile, job_title: str, company: str
     ) -> str:
-        return self._get_active_provider().generate_cover_letter(
-            candidate_profile, jd_profile, job_title, company
+        return self._call_with_failover(
+            "generate_cover_letter", candidate_profile, jd_profile, job_title, company
         )
 
 
@@ -487,11 +687,17 @@ _engine_instance: AIEngine | None = None
 
 
 def get_ai_engine(settings: dict | None = None) -> AIEngine:
-    """Return the global AIEngine singleton."""
+    """Return the global AIEngine singleton (reset if settings change)."""
     global _engine_instance
     if _engine_instance is None:
         _engine_instance = AIEngine(settings)
     return _engine_instance
+
+
+def reset_engine() -> None:
+    """Force-reset the singleton (useful for testing or config reload)."""
+    global _engine_instance
+    _engine_instance = None
 
 
 # ============================================================
